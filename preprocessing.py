@@ -7,7 +7,7 @@ def return_embedding(representation, model, tokenizer, max_seq_length=512, segme
     start = 0
     for family in representation:
         for id_ in representation[family]:
-            text = " ".join(representation[family][id_])
+            text = representation[family][id_]
             while start < len(text):
                 end = min(start + segment_length, len(text))
                 segment = text[start:end]
@@ -30,6 +30,7 @@ def return_embedding(representation, model, tokenizer, max_seq_length=512, segme
             labels.append(family)
     return data, labels
 
+def handle_large_input()
 
 def get_embeddings(texts, model, tokenizer, cls_embedding=True, pooling=True):
     # model.to(device)
@@ -44,3 +45,14 @@ def get_embeddings(texts, model, tokenizer, cls_embedding=True, pooling=True):
             if pooling:
                 embeddings = torch.mean(embeddings, dim=0)
     return embeddings
+
+def get_malware_embeddings(representation, texts, model, tokenizer, cls_embedding=True, pooling=True, max_size=500, chunk_size=100):
+    for family in representation:
+        for id_ in representation[family]:
+            text = " ".join(representation[family][id_])
+            text_size = len(tokenizer.tokenize(text))
+            if text_size > max_size:
+
+
+
+

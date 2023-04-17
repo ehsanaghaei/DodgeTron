@@ -27,4 +27,4 @@ if __name__ == "__main__":
     text = " ".join(representations_sum['emotet']['d8ea223ed89c83d10ef935a77c3a2e5ecb5e5817dea7e9f459eaee17a9a90202.emotet'])
     text2 = " ".join(representations_sum['emotet']['aeca6bcf2db969cb99ee3819cba054507effe800e24c8db41bb5a29a24a89102.emotet'])
     a = get_embeddings(text, model, tokenizer)
-    b = get_embeddings('my name is Ehsan', model, tokenizer)
+    b = get_embeddings('my name is Ehsan', model, tokenizer, cls_embedding=True, pooling=True)
