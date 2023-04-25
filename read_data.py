@@ -62,47 +62,48 @@ def build_representation(malwares, segments: list, joined=False):
 
 def build_representation_batch(fnames, segments: list, joined=False, save=True, load=True):
     if load:
-        print("Load preprocessd representations")
+        print("[build_representation_batch()] -> Load preprocessd representations")
         if type(load) == bool:
             fname = "/media/ea/SSD2/Projects/DodgeTron/data/representations-2023-04-19.json"
         else:
             fname = load
         return func_read_json(fname)
-    else:
-        if segments is None:
-            segments = ['api']
-        from collections import defaultdict
-        representations = defaultdict(dict)
 
-        c_err = 0
-        for f_idx, f in enumerate(fnames):
+    print("[build_representation_batch()] -> ** Load Failed. Start reading data.")
+    if segments is None:
+        segments = ['api']
+    from collections import defaultdict
+    representations = defaultdict(dict)
 
-            print(f"{f_idx}/{len(fnames)} -> {f}")
-            data = func_read_json(f)
-            family = f.split("/")[-2]
-            id_ = f.split("/")[-1].replace(".json", "")
-            if data.get("behavior"):
-                process_count = len(data["behavior"]["processes"])
-                for i in range(process_count):
-                    if data["behavior"]["processes"][i]['calls']:
-                        calls = data["behavior"]["processes"][i]['calls']
-                        sequence = list()
-                        for call, sub_call in enumerate(calls):
-                            # sub_call = calls[call]
-                            seq = ""
-                            for seg in segments:
-                                seq += f"{seg}:{sub_call[seg]} "
-                            sequence.append(seq)
-                        if joined:
-                            sequence = " ".join(sequence)
-                        representations[family][id_] = sequence
+    c_err = 0
+    for f_idx, f in enumerate(fnames):
 
-            else:
-                c_err += 1
-                print(c_err, "*ERROR: No behavior key!")
-                print(f"{c_err}- There is no 'behavior' key in \n{f}")
-        if save:
-            func_write_json(representations, os.path.join(PATH_data, '-'.join(['representations', str(datetime.date.today())]) + ".json"))
+        print(f"{f_idx}/{len(fnames)} -> {f}")
+        data = func_read_json(f)
+        family = f.split("/")[-2]
+        id_ = f.split("/")[-1].replace(".json", "")
+        if data.get("behavior"):
+            process_count = len(data["behavior"]["processes"])
+            for i in range(process_count):
+                if data["behavior"]["processes"][i]['calls']:
+                    calls = data["behavior"]["processes"][i]['calls']
+                    sequence = list()
+                    for call, sub_call in enumerate(calls):
+                        # sub_call = calls[call]
+                        seq = ""
+                        for seg in segments:
+                            seq += f"{seg}:{sub_call[seg]} "
+                        sequence.append(seq)
+                    if joined:
+                        sequence = " ".join(sequence)
+                    representations[family][id_] = sequence
+
+        else:
+            c_err += 1
+            print(c_err, "*ERROR: No behavior key!")
+            print(f"{c_err}- There is no 'behavior' key in \n{f}")
+    if save:
+        func_write_json(representations, os.path.join(PATH_data, '-'.join(['representations', str(datetime.date.today())]) + ".json"))
 
     return representations
 
@@ -133,14 +134,17 @@ def find_repeated_patterns_(lst, n):
     return patterns
 
 
-def rep_summarizer(representations, shorten_duplicates=True, shorten_all=False):
+def rep_summarizer(representations, shorten_duplicates=True, shorten_prefix='api:'):
     if shorten_duplicates:
         for family in representations:
             for id_ in representations[family]:
                 call = representations[family][id_]
-                count = 1
 
+                count = 1
+                if shorten_prefix:
+                    call = [c.replace(shorten_prefix, "") for c in call]
                 prev_text = call[0]
+
                 output = []
 
                 for i in range(1, len(call)):
