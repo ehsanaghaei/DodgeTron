@@ -3,8 +3,7 @@ from transformers import AutoModel, AutoTokenizer, pipeline, AutoModelForSequenc
 import torch
 import time
 from gsp import GSP
-from elephant import spade
-
+from elephant.spade import spade
 
 
 
@@ -70,7 +69,7 @@ def pattern_extractor(encoded_sequences, method):
     if method == "PrefixSpan":
         start_time = time.time()
         ps = PrefixSpan(encoded_sequences)
-        patterns_ps = ps.frequent(min_sup=min_sup, max_pattern=max_pat, min_len=min_len, max_len=max_len)
+        patterns_ps = ps.frequent(min_sup)
         end_time = time.time()
         print("PrefixSpan found", len(patterns_ps), "patterns in", round(end_time - start_time, 2), "seconds")
 
