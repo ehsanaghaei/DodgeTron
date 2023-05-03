@@ -183,6 +183,40 @@ def json_differences(file1, file2):
     print("Common keys:", common_keys)
     print("Common values:", common_values)
 
+def catch_family_name(text):
+    import re
+    pattern = r"\b(azorult|dridex|emotet|gen_stealer|khalesi|kpot|loki|password_stealer|ramnit)\b"
+    matches = re.findall(pattern, text, re.IGNORECASE)[-1]
+    return matches
+
+
+def read_tensor_from_file(fnames, to_numpy=True, to_dict=True):
+    import torch
+    from collections import defaultdict
+
+    if to_dict:
+        tensors = defaultdict(list)
+    else:
+        tensors = []
+
+    # Load each file as a tensor and append it to the list
+    for file_path in fnames:
+        family = catch_family_name(file_path)
+        try:
+            if to_numpy:
+                tensor = torch.load(file_path).numpy()
+            else:
+                tensor = torch.load(file_path)
+            if to_dict:
+                tensors[family].append(tensor)
+            else:
+                tensors.append(tensor)
+        except:
+            print(f"[read_tensor_from_file] -> Unable to read {file_path.split('/')[-1]}")
+
+    # Combine the tensors into a single tensor
+    return tensors
+
 # ---------------------------------------------------------------------------------------------------------------------------
 
 # if __name__ == "__main__":
