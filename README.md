@@ -57,4 +57,4 @@ if __name__ == "__main__":
 ````
 
 We use hierarchical clustering method and calculate the hemogeneity score. 
-![Figure_1.png](..%2F..%2F..%2F..%2F..%2Fhome%2Fea%2FDocuments%2FFigure_1.png)
+![Figure_1.png](Figure_1.png)
